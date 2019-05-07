@@ -67,7 +67,7 @@ func (s *devServer) start(ctx context.Context, stdout, stderr io.Writer) (*exec.
 	myDir := myPkg.Dir
 	assetDir := filepath.Join(myDir, "..", "..", "..", "web")
 
-	logger.Get(ctx).Infof("Installing Tilt NodeJS dependencies…")
+	logger.Get(ctx).Infof("Installing Tilt NodeJS dependencies into %s", assetDir)
 	cmd := exec.CommandContext(ctx, "yarn", "install")
 	cmd.Dir = assetDir
 	stdoutString := &strings.Builder{}
@@ -86,7 +86,7 @@ func (s *devServer) start(ctx context.Context, stdout, stderr io.Writer) (*exec.
 	cmd.Dir = assetDir
 	cmd.Env = append(os.Environ(), "BROWSER=none", fmt.Sprintf("PORT=%d", s.port))
 
-	// yarn will spawn the dev server as a subproces, so set
+	// yarn will spawn the dev server as a subprocess, so set
 	// a process group id so we can murder them all.
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 

@@ -563,6 +563,11 @@ func (s *tiltfileState) dockerignoresForPaths(paths []string) []model.Dockerigno
 			continue
 		}
 
+		result = append(result, model.Dockerignore{
+			LocalPath: path,
+			Contents: "**/ignored.txt\n",
+		})
+		
 		contents, err := s.readFile(s.localPathFromString(filepath.Join(path, ".dockerignore")))
 		if err != nil {
 			continue
