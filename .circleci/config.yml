@@ -3,7 +3,6 @@ jobs:
   build-linux:
     docker:
       - image: gcr.io/windmill-public-containers/tilt-ci@sha256:715d57e55849eadeb27afc48f4b5b8a48d48af1b58337b9af061d99629ca57d7
-    working_directory: /go/src/github.com/windmilleng/tilt
     steps:
       - checkout
       - run: echo 'export PATH=~/go/bin:$PATH' >> $BASH_ENV
@@ -23,16 +22,14 @@ jobs:
   build-windows:
     docker:
       - image: circleci/golang:1.12
-    working_directory: /go/src/github.com/windmilleng/tilt
     steps:
       - checkout
       # Currently, we only check to make sure Windows binaries compile
-      - run: GOOS=windows go install github.com/windmilleng/tilt/cmd/tilt
+      - run: GOOS=windows go install ./cmd/tilt
 
   build-integration:
     docker:
       - image: gcr.io/windmill-public-containers/tilt-integration-ci@sha256:f086d1284cae6a055ffa3fa0dcbbb9b23c0bca8695c8c61015d993f02b562e02
-    working_directory: /go/src/github.com/windmilleng/tilt
     steps:
       - checkout
       - run: echo 'export PATH=~/go/bin:$PATH' >> $BASH_ENV
@@ -55,7 +52,6 @@ jobs:
     macos:
       xcode: "10.0.0"
 
-    working_directory: ~/go/src/github.com/windmilleng/tilt
     steps:
       - checkout
       - restore_cache:
