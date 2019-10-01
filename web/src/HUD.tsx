@@ -358,9 +358,11 @@ class HUD extends Component<HudProps, HudState> {
     let runningVersion = view && view.RunningTiltBuild
     let latestVersion = view && view.LatestTiltBuild
     let shareSnapshotModal = this.renderShareSnapshotModal(view)
+    let snapshotHeader = this.renderSnapshotHeader(view)
     let fatalErrorModal = this.renderFatalErrorModal(view)
     return (
       <div className="HUD">
+        {snapshotHeader}
         <AnalyticsNudge needsNudge={needsNudge} />
         {fatalErrorModal}
         {shareSnapshotModal}
@@ -480,6 +482,18 @@ class HUD extends Component<HudProps, HudState> {
         isOpen={this.state.showSnapshotModal}
       />
     )
+  }
+
+  renderSnapshotHeader(view: HudView | null) {
+    if (this.pathBuilder.isSnapshot()) {
+      return (
+        // NB: this currently isn't working, probably due to CSS issues? I can see the iframe in the DOM,
+        // but haven't been able to make it visible
+        <iframe src="/snapshot_header" width="100%" height="40px"/>
+      )
+    } else {
+      return null
+    }
   }
 
   renderFatalErrorModal(view: HudView | null) {
