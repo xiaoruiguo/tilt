@@ -57,7 +57,7 @@ func NewCompositeBuildAndDeployer(builders BuildOrder) *CompositeBuildAndDeploye
 func (composite *CompositeBuildAndDeployer) BuildAndDeploy(ctx context.Context, st store.RStore, specs []model.TargetSpec, currentState store.BuildStateSet) (store.BuildResultSet, error) {
 	var lastErr, lastUnexpectedErr error
 	logger.Get(ctx).Debugf("Building with BuildOrder: %s", composite.builders.String())
-	for i, builder := range composite.builders {
+	for _, builder := range composite.builders {
 		logger.Get(ctx).Debugf("Trying to build and deploy with %T", builder)
 		br, err := builder.BuildAndDeploy(ctx, st, specs, currentState)
 		if err == nil {
@@ -73,9 +73,6 @@ func (composite *CompositeBuildAndDeployer) BuildAndDeploy(ctx context.Context, 
 			logger.Get(ctx).Write(redirectErr.level, s)
 		} else {
 			lastUnexpectedErr = err
-			if i+1 < len(composite.builders) {
-				logger.Get(ctx).Infof("got unexpected error during build/deploy: %v", err)
-			}
 		}
 		lastErr = err
 	}

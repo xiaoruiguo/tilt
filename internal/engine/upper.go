@@ -291,11 +291,7 @@ func handleBuildCompleted(ctx context.Context, engineState *store.EngineState, c
 	if err != nil {
 		if isFatalError(err) {
 			return err
-		} else if engineState.WatchFiles {
-			l := logger.Get(ctx)
-			p := logger.Red(l).Sprintf("Build Failed:")
-			l.Infof("%s %v", p, err)
-		} else {
+		} else if !engineState.WatchFiles {
 			return errors.Wrap(err, "Build Failed")
 		}
 	} else {
