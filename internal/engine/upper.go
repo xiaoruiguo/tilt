@@ -255,21 +255,20 @@ func handleBuildStarted(ctx context.Context, state *store.EngineState, action Bu
 		ms.CrashLog = model.Log{}
 	}
 
-	// ~~ note: should be a set now
-	state.CurrentlyBuilding = mn
+	state.CurrentlyBuilding[mn] = true
 	removeFromTriggerQueue(state, mn)
 }
 
 func handleBuildCompleted(ctx context.Context, engineState *store.EngineState, cb BuildCompleteAction) error {
 	defer func() {
-		engineState.CurrentlyBuilding = ""
+		delete(engineState.CurrentlyBuilding, cb.ManifestName)
 	}()
 
 	buildCount := engineState.BuildControllerSlotsAvailable
 	engineState.CompletedBuildCount++
 	engineState.BuildControllerSlotsAvailable++
 
-	mt, ok := engineState.ManifestTargets[engineState.CurrentlyBuilding]
+	mt, ok := engineState.ManifestTargets[cb.ManifestName]
 	if !ok {
 		return nil
 	}
@@ -583,7 +582,7 @@ func handleConfigsReloaded(
 func handleBuildLogAction(state *store.EngineState, action BuildLogAction) {
 	manifestName := action.ManifestName()
 	ms, ok := state.ManifestState(manifestName)
-	if !ok || state.CurrentlyBuilding != manifestName {
+	if !ok || !state.IsCurrentlyBuilding(manifestName) {
 		// This is OK. The user could have edited the manifest recently.
 		return
 	}
