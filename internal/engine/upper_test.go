@@ -1400,9 +1400,8 @@ func TestPodUnexpectedContainerStartsImageBuild(t *testing.T) {
 		StartTime:    time.Now(),
 	})
 
-	f.store.Dispatch(BuildCompleteAction{
-		Result: liveUpdateResultSet(manifest, "theOriginalContainer"),
-	})
+	f.store.Dispatch(NewBuildCompleteAction(name,
+		liveUpdateResultSet(manifest, "theOriginalContainer"), nil))
 
 	f.WaitUntil("nothing waiting for build", func(st store.EngineState) bool {
 		return st.CompletedBuildCount == 1 && buildcontrol.NextManifestNameToBuild(st) == ""
@@ -1450,9 +1449,8 @@ func TestPodUnexpectedContainerStartsImageBuildOutOfOrderEvents(t *testing.T) {
 
 	// ...and finish the build. Even though this action comes in AFTER the pod
 	// event w/ unexpected container,  we should still be able to detect the mismatch.
-	f.store.Dispatch(BuildCompleteAction{
-		Result: liveUpdateResultSet(manifest, "theOriginalContainer"),
-	})
+	f.store.Dispatch(NewBuildCompleteAction(name,
+		liveUpdateResultSet(manifest, "theOriginalContainer"), nil))
 
 	f.WaitUntilManifestState("NeedsRebuildFromCrash set to True", "foobar", func(ms store.ManifestState) bool {
 		return ms.NeedsRebuildFromCrash
@@ -1492,9 +1490,8 @@ func TestPodUnexpectedContainerAfterSuccessfulUpdate(t *testing.T) {
 		WithCreationTime(podStartTime).
 		WithDeploymentUID(ancestorUID).
 		WithTemplateSpecHash(ptsh)
-	f.store.Dispatch(BuildCompleteAction{
-		Result: deployResultSet(manifest, ancestorUID, []k8s.PodTemplateSpecHash{ptsh}),
-	})
+	f.store.Dispatch(NewBuildCompleteAction(name,
+		deployResultSet(manifest, ancestorUID, []k8s.PodTemplateSpecHash{ptsh}), nil))
 
 	f.store.Dispatch(k8swatch.NewPodChangeAction(pb.Build(), manifest.Name, ancestorUID))
 	f.WaitUntil("nothing waiting for build", func(st store.EngineState) bool {
@@ -1515,9 +1512,8 @@ func TestPodUnexpectedContainerAfterSuccessfulUpdate(t *testing.T) {
 	pb = pb.WithContainerID("funny-container-id")
 	f.store.Dispatch(k8swatch.NewPodChangeAction(pb.Build(), manifest.Name, ancestorUID))
 
-	f.store.Dispatch(BuildCompleteAction{
-		Result: liveUpdateResultSet(manifest, "normal-container-id"),
-	})
+	f.store.Dispatch(NewBuildCompleteAction(name,
+		liveUpdateResultSet(manifest, "normal-container-id"), nil))
 
 	f.WaitUntilManifestState("NeedsRebuildFromCrash set to True", "foobar", func(ms store.ManifestState) bool {
 		return ms.NeedsRebuildFromCrash
