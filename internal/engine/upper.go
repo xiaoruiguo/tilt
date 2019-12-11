@@ -238,6 +238,7 @@ func handleBuildStarted(ctx context.Context, state *store.EngineState, action Bu
 	}
 	ms.ConfigFilesThatCausedChange = []string{}
 	ms.CurrentBuild = bs
+	state.BuildControllerSlotsAvailable -= 1
 
 	if ms.IsK8s() {
 		for _, pod := range ms.K8sRuntimeState().Pods {
@@ -254,6 +255,7 @@ func handleBuildStarted(ctx context.Context, state *store.EngineState, action Bu
 		ms.CrashLog = model.Log{}
 	}
 
+	// ~~ note: should be a set now
 	state.CurrentlyBuilding = mn
 	removeFromTriggerQueue(state, mn)
 }
@@ -263,9 +265,9 @@ func handleBuildCompleted(ctx context.Context, engineState *store.EngineState, c
 		engineState.CurrentlyBuilding = ""
 	}()
 
-	buildCount := engineState.BuildControllerActionCount
+	buildCount := engineState.BuildControllerSlotsAvailable
 	engineState.CompletedBuildCount++
-	engineState.BuildControllerActionCount++
+	engineState.BuildControllerSlotsAvailable++
 
 	mt, ok := engineState.ManifestTargets[engineState.CurrentlyBuilding]
 	if !ok {
