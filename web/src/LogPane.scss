@@ -16,6 +16,17 @@
     opacity: 1;
   }
 }
+@keyframes blinkWarning {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.62;
+  }
+  100% {
+    opacity: 1;
+  }
+}
 
 .logEnd {
   animation: blink 1s infinite;
@@ -26,22 +37,30 @@
 .LogPane-empty {
   margin: 0;
 }
-
+.logLine {
+  position: relative;
+}
 .LogPane .logLine {
   margin-left: $spacing-unit / 2;
   margin-right: $spacing-unit / 2;
   display: flex;
 }
-
+.logLine.is-warning::before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  left: -$spacing-unit/2;
+  height: 100%;
+  border-left: 3px solid $color-yellow;
+  animation: blinkWarning 2s infinite;
+}
 .logLine-content {
   white-space: pre-wrap;
   min-height: $spacing-unit / 2; // Respect blank lines
 }
-
 .LogPane ::selection {
   background-color: rgba($color-blue, $translucent);
 }
-
 .LogPane .highlighted .logLine-content {
   background-color: rgba($color-blue, $translucent);
 }
